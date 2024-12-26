@@ -8,7 +8,10 @@ app = Flask(__name__)
 
 def print_invoice(invoice_date=None):
     # Path to the text file that tracks printed invoices
-    track_file = 'printed_invoices.txt'
+    track_file = 'Files/Texts/printed_invoices.txt'
+    
+    # Ensure the directory for the text file exists
+    os.makedirs(os.path.dirname(track_file), exist_ok=True)
     
     # Read the already printed invoices
     if os.path.exists(track_file):

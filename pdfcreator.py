@@ -12,9 +12,9 @@ class PDFCreator:
         pdf = FPDF(format='A3')
         self.setup_fonts(pdf)
         
-        base_invoice_numbers = self.load_base_invoice_numbers('name_mapping.txt')
-        description_mapping = self.load_english_description_mapping('description_mapping.txt')
-        arabic_description_mapping = self.load_arabic_description_mapping('arabic_description_mapping.txt')
+        base_invoice_numbers = self.load_base_invoice_numbers('Files/Texts/name_mapping.txt')
+        description_mapping = self.load_english_description_mapping('Files/Texts/description_mapping.txt')
+        arabic_description_mapping = self.load_arabic_description_mapping('Files/Texts/arabic_description_mapping.txt')
         increment = self.calculate_increment(invoicedate)
 
         for title, dataframe in dataframes_dict.items():
@@ -39,8 +39,8 @@ class PDFCreator:
         pdf.output(output_path, 'F')
 
     def setup_fonts(self, pdf):
-        pdf.add_font('Amiri', '', 'Amiri-Regular.ttf', uni=True)
-        pdf.add_font('Amiri', 'B', 'Amiri-Bold.ttf', uni=True)
+        pdf.add_font('Amiri', '', 'Files/Fonts/Amiri-Regular.ttf', uni=True)
+        pdf.add_font('Amiri', 'B', 'Files/Fonts/Amiri-Bold.ttf', uni=True)
 
     def calculate_increment(self, invoicedate):
         base_date = datetime.strptime("2024-12-24", "%Y-%m-%d")
@@ -153,7 +153,14 @@ class PDFCreator:
         if os.path.exists(img_path):
             os.remove(img_path)
 
+    def create_default_file(self, file_path, default_content):
+        with open(file_path, 'w') as f:
+            for key, value in default_content.items():
+                f.write(f"{key}: {value}\n")
+
     def load_base_invoice_numbers(self, file_path):
+        if not os.path.exists(file_path):
+            self.create_default_file(file_path, {"example_key": "example_value"})
         base_invoice_numbers = {}
         with open(file_path, 'r') as f:
             lines = f.readlines()
@@ -168,6 +175,8 @@ class PDFCreator:
         return base_invoice_numbers
 
     def load_english_description_mapping(self, file_path):
+        if not os.path.exists(file_path):
+            self.create_default_file(file_path, {"example_sku": "example_description"})
         description_mapping = {}
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -178,6 +187,8 @@ class PDFCreator:
         return description_mapping
 
     def load_arabic_description_mapping(self, file_path):
+        if not os.path.exists(file_path):
+            self.create_default_file(file_path, {"example_sku": "example_arabic_description"})
         arabic_description_mapping = {}
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:

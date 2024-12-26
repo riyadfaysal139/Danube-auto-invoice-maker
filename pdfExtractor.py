@@ -12,21 +12,28 @@ def is_valid_pdf(file_path):
     except Exception:
         return False
 
-def load_name_mapping(file_path):
-    name_mapping = {}
+def create_default_file(file_path, default_content):
+    with open(file_path, 'w') as f:
+        for key, value in default_content.items():
+            f.write(f"{key}: {value}\n")
+
+def load_mapping(file_path, default_content):
+    if not os.path.exists(file_path):
+        create_default_file(file_path, default_content)
+    mapping = {}
     with open(file_path, 'r') as f:
         for line in f:
             key, value = line.strip().split(':')
-            name_mapping[key.strip()] = value.strip()
-    return name_mapping
+            mapping[key.strip()] = value.strip()
+    return mapping
 
 def extract_data_from_pdfs(po_date):
-    po_date_directory = os.path.join('PO', po_date)
+    po_date_directory = os.path.join('Files', 'PO', po_date)
     if not os.path.exists(po_date_directory):
         print(f"No directory found for PO date: {po_date}")
-        return
+        return {}, {}
 
-    name_mapping = load_name_mapping('name_mapping.txt')
+    name_mapping = load_mapping('Files/Texts/name_mapping.txt', {"example_key": "example_value"})
     dataframes = {}
     po_numbers = {}
 
@@ -94,6 +101,18 @@ def extract_data_from_pdfs(po_date):
             if not replaced:
                 # Keep only JED_**** part if no mapping is found
                 file_name = 'JED_' + file_name.split('JED_')[1].split('_')[0]
+
+            # Delete the last row
+            if len(df) > 0:
+                df = df[:-1]
+
+            # Calculate totals and add a new row
+            total_quantity = int(df["Quantity"].dropna().astype(float).sum())
+            total_price = round(df["Price"].dropna().astype(float).sum(), 4)
+            total_vat = round(df["Vat"].dropna().astype(float).sum(), 4)
+            total_amount = round(df["Amount"].dropna().astype(float).sum(), 4)
+            total_row = pd.DataFrame([["", "Total", "", total_quantity, total_price, total_vat, total_amount]], columns=df.columns)
+            df = df.append(total_row, ignore_index=True)
 
             dataframes[file_name] = df
             po_numbers[file_name] = po_number

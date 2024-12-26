@@ -119,7 +119,7 @@ class PODownloader:
                     if len(row.query_selector_all("td")) >= 4
                 ]
 
-                for link in pdf_links[:2]:  # Download only the first two files from the viewed section
+                for link in pdf_links[:8]:  # Download only the first two files from the viewed section
                     download_path = os.path.basename(link)
                     if not is_file_downloaded(download_path, cursor):
                         try:

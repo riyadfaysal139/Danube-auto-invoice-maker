@@ -1,0 +1,16 @@
+example_sku: example_description
+80:Regla
+88:Mulukhia
+522:Lettuce
+648:Parsley
+649:Coriander
+650:Mint
+651:Spinach
+652:Dill
+653:Habak
+654:Gerger
+655:Leeks
+656:Green Onion
+657:Red Turnip
+658:White Turnip
+659:Silk

@@ -13,12 +13,11 @@ po_date_directory = os.path.join('Files', 'PO', str(po_date))
 invoice_date_directory = os.path.join('Files', 'Invoices', str(invoicedate))
 
 os.makedirs(po_date_directory, exist_ok=True)
-os.makedirs(invoice_date_directory, exist_ok=True)
+#os.makedirs(invoice_date_directory, exist_ok=True)
 
 # Download all PO
-poDownloader.PODownloader.login()
+#poDownloader.PODownloader.login()
 
-"""
 dataframes_dict, po_numbers = pdfExtractor.extract_data_from_pdfs(str(po_date))
 
 # Create an instance of PDFCreator
@@ -29,10 +28,15 @@ po_day = get_day(po_date)
 invoice_day = get_day(invoicedate)
 
 # Call create_pdf method with the dataframe dictionary, po_numbers, output file path, po_date, and invoicedate
-pdf_creator.create_pdf(dataframes_dict, po_numbers, os.path.join(invoice_date_directory, f"{invoicedate}.pdf"), po_date=f"{po_date} ({po_day})", invoicedate=f"{invoicedate} ({invoice_day})")
+output_path = os.path.join('Files', 'Invoices', f"{invoicedate}.pdf")
+pdf_creator.create_pdf(dataframes_dict, po_numbers, output_path, po_date=f"{po_date} ({po_day})", invoicedate=f"{invoicedate} ({invoice_day})")
 
+# Return the path of the created invoice file
+print(output_path)
 # Print the invoices
-print_invoice(invoicedate)
+#print_invoice(invoicedate)
+"""
+
 
 
 DailyWorksheet.createSheet(shpr,invoicedate,ifNewPo,polinks,poNOd)
