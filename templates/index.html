@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Select PO Date</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-5">Select PO Date</h1>
+      <form method="post">
+        <div class="form-group">
+          <label for="po_date">PO Date</label>
+          <input type="date" class="form-control" id="po_date" name="po_date" value="{{ default_date }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Run</button>
+      </form>
+    </div>
+  </body>
+</html>

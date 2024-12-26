@@ -6,13 +6,23 @@ from datetime import datetime
 import platform
 import subprocess
 import time
+import sqlite3
 
 class PODownloader:
     def login():
         url = 'https://bindawoodapps.com/BDS/'
         username = '337337'
         password = '12345678'
-        downloaded_files_log = 'downloaded_files.txt'
+        db_path = 'Files/DB/downloaded_files.db'
+
+        # Ensure the directory for the database file exists
+        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
+        # Initialize the database
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS downloaded_files (file_name TEXT PRIMARY KEY, po_release_date TEXT)''')
+        conn.commit()
 
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=False, slow_mo=50)
@@ -57,30 +67,42 @@ class PODownloader:
                     if len(row.query_selector_all("td")) >= 4
                 ]
 
-                # Download the first 20 PDF files and check the date mentioned in the PDF
-                for link in pdf_links[:20]:
+                # Download all PDF files and check the date mentioned in the PDF
+                for link in pdf_links:
                     download_path = os.path.basename(link)
-                    if not is_file_downloaded(download_path, downloaded_files_log):
-                        response = requests.get(link)
-                        with open(download_path, 'wb') as f:
-                            f.write(response.content)
+                    if not is_file_downloaded(download_path, cursor):
+                        try:
+                            print(f"Downloading: {link}")
+                            response = requests.get(link)
+                            print(f"Response status code: {response.status_code}")
+                            response.raise_for_status()  # Raise an exception for HTTP errors
+                            with open(download_path, 'wb') as f:
+                                f.write(response.content)
 
-                        with pdfplumber.open(download_path) as pdf:
-                            text = "".join(page.extract_text() for page in pdf.pages)
-                            po_release_date = datetime.strptime(text.split('PO Released Date:')[1].split()[0], '%d/%m/%y').strftime('%Y-%m-%d')
-                            po_release_day = datetime.strptime(po_release_date, '%Y-%m-%d').strftime('%A')
-                            po_date_directory = os.path.join('PO', po_release_date)
-                            os.makedirs(po_date_directory, exist_ok=True)
-                            final_path = os.path.join(po_date_directory, download_path)
+                            with pdfplumber.open(download_path) as pdf:
+                                text = "".join(page.extract_text() for page in pdf.pages)
+                                po_release_date = datetime.strptime(text.split('PO Released Date:')[1].split()[0], '%d/%m/%y').strftime('%Y-%m-%d')
+                                # Debugging statement to check po_release_date
+                                print(f"Extracted po_release_date: {po_release_date}")
+                                # Ensure po_release_date is correctly extracted
+                                if po_release_date:
+                                    po_release_day = datetime.strptime(po_release_date, '%Y-%m-%d').strftime('%A')
+                                    po_date_directory = os.path.join('Files', 'PO', po_release_date)
+                                    os.makedirs(po_date_directory, exist_ok=True)
+                                    final_path = os.path.join(po_date_directory, download_path)
 
-                            if not os.path.exists(final_path):
-                                os.rename(download_path, final_path)
-                                print(f"Downloaded and saved: {final_path}")
-                                log_downloaded_file(download_path, downloaded_files_log)
-                                # print_file(final_path)  # Comment out this line if printing is not required
-                            else:
-                                os.remove(download_path)
-                                print(f"The PO has already been downloaded for date {po_release_date} & day {po_release_day}")
+                                    if not os.path.exists(final_path):
+                                        os.rename(download_path, final_path)
+                                        print(f"Downloaded and saved: {final_path}")
+                                        log_downloaded_file(download_path, po_release_date, cursor, conn)
+                                        # print_file(final_path)  # Comment out this line if printing is not required
+                                    else:
+                                        os.remove(download_path)
+                                        print(f"The PO has already been downloaded for date {po_release_date} {po_release_day}")
+                                else:
+                                    print(f"Failed to extract po_release_date from {download_path}")
+                        except Exception as e:
+                            print(f"Failed to download {link}: {e}")
             else:
                 print("No new PO found")
 
@@ -97,42 +119,52 @@ class PODownloader:
                     if len(row.query_selector_all("td")) >= 4
                 ]
 
-                for link in pdf_links[:20]:
+                for link in pdf_links[:2]:  # Download only the first two files from the viewed section
                     download_path = os.path.basename(link)
-                    if not is_file_downloaded(download_path, downloaded_files_log):
-                        response = requests.get(link)
-                        with open(download_path, 'wb') as f:
-                            f.write(response.content)
+                    if not is_file_downloaded(download_path, cursor):
+                        try:
+                            print(f"Downloading: {link}")
+                            response = requests.get(link)
+                            print(f"Response status code: {response.status_code}")
+                            response.raise_for_status()  # Raise an exception for HTTP errors
+                            with open(download_path, 'wb') as f:
+                                f.write(response.content)
 
-                        with pdfplumber.open(download_path) as pdf:
-                            text = "".join(page.extract_text() for page in pdf.pages)
-                            po_release_date = datetime.strptime(text.split('PO Released Date:')[1].split()[0], '%d/%m/%y').strftime('%Y-%m-%d')
-                            po_release_day = datetime.strptime(po_release_date, '%Y-%m-%d').strftime('%A')
-                            po_date_directory = os.path.join('PO', po_release_date)
-                            os.makedirs(po_date_directory, exist_ok=True)
-                            final_path = os.path.join(po_date_directory, download_path)
+                            with pdfplumber.open(download_path) as pdf:
+                                text = "".join(page.extract_text() for page in pdf.pages)
+                                po_release_date = datetime.strptime(text.split('PO Released Date:')[1].split()[0], '%d/%m/%y').strftime('%Y-%m-%d')
+                                # Debugging statement to check po_release_date
+                                print(f"Extracted po_release_date: {po_release_date}")
+                                # Ensure po_release_date is correctly extracted
+                                if po_release_date:
+                                    po_release_day = datetime.strptime(po_release_date, '%Y-%m-%d').strftime('%A')
+                                    po_date_directory = os.path.join('Files', 'PO', po_release_date)
+                                    os.makedirs(po_date_directory, exist_ok=True)
+                                    final_path = os.path.join(po_date_directory, download_path)
 
-                            if not os.path.exists(final_path):
-                                os.rename(download_path, final_path)
-                                print(f"Downloaded and saved: {final_path}")
-                                log_downloaded_file(download_path, downloaded_files_log)
-                                # print_file(final_path)  # Comment out this line if printing is not required
-                            else:
-                                os.remove(download_path)
-                                print(f"The PO has already been downloaded for date {po_release_date} & day {po_release_day}")
+                                    if not os.path.exists(final_path):
+                                        os.rename(download_path, final_path)
+                                        print(f"Downloaded and saved: {final_path}")
+                                        log_downloaded_file(download_path, po_release_date, cursor, conn)
+                                        # print_file(final_path)  # Comment out this line if printing is not required
+                                    else:
+                                        os.remove(download_path)
+                                        print(f"The PO has already been downloaded for date {po_release_date} & day {po_release_day}")
+                                else:
+                                    print(f"Failed to extract po_release_date from {download_path}")
+                        except Exception as e:
+                            print(f"Failed to download {link}: {e}")
 
             browser.close()
+            conn.close()
 
-def is_file_downloaded(file_name, log_file):
-    if os.path.exists(log_file):
-        with open(log_file, 'r') as f:
-            downloaded_files = f.read().splitlines()
-            return file_name in downloaded_files
-    return False
+def is_file_downloaded(file_name, cursor):
+    cursor.execute("SELECT 1 FROM downloaded_files WHERE file_name = ?", (file_name,))
+    return cursor.fetchone() is not None
 
-def log_downloaded_file(file_name, log_file):
-    with open(log_file, 'a') as f:
-        f.write(file_name + '\n')
+def log_downloaded_file(file_name, po_release_date, cursor, conn):
+    cursor.execute("INSERT INTO downloaded_files (file_name, po_release_date) VALUES (?, ?)", (file_name, po_release_date))
+    conn.commit()
 
 def print_file(file_path):
     if platform.system() == 'Windows':
@@ -141,8 +173,3 @@ def print_file(file_path):
         subprocess.run(['lp', file_path])
     else:
         print("Printing is not supported on this OS")
-
-
-
-
-

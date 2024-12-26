@@ -1,21 +1,24 @@
+import sys
 from dateTimeHandler import get_date, get_day
 import poDownloader, os, pdfExtractor
 from pdfcreator import PDFCreator
 from invoiceprinter import print_invoice  # Import the print function
 
-# Download all PO
-poDownloader.PODownloader.login()
-
-po_date = get_date()  # Example: get_date(days=5, specific_date='2023-10-01')
+# Get po_date from command-line argument or use default
+po_date = sys.argv[1] if len(sys.argv) > 1 else get_date()
 invoicedate = get_date(days=1, specific_date=str(po_date))
 
 # Create directories for po_date and invoicedate
-po_date_directory = os.path.join('PO', str(po_date))
-invoice_date_directory = os.path.join('Invoices', str(invoicedate))
+po_date_directory = os.path.join('Files', 'PO', str(po_date))
+invoice_date_directory = os.path.join('Files', 'Invoices', str(invoicedate))
 
 os.makedirs(po_date_directory, exist_ok=True)
 os.makedirs(invoice_date_directory, exist_ok=True)
 
+# Download all PO
+poDownloader.PODownloader.login()
+
+"""
 dataframes_dict, po_numbers = pdfExtractor.extract_data_from_pdfs(str(po_date))
 
 # Create an instance of PDFCreator
@@ -31,7 +34,7 @@ pdf_creator.create_pdf(dataframes_dict, po_numbers, os.path.join(invoice_date_di
 # Print the invoices
 print_invoice(invoicedate)
 
-"""
+
 DailyWorksheet.createSheet(shpr,invoicedate,ifNewPo,polinks,poNOd)
 
 pdfMerger.mergePdf(invoicedate,isprintTime,statementTime,parsingdate)#Merge all the created pdf's into one file(Don't move it anywhere else)
