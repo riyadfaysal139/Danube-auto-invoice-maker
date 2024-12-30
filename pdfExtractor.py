@@ -102,12 +102,19 @@ def extract_data_from_pdfs(po_date):
                 # Keep only JED_**** part if no mapping is found
                 file_name = 'JED_' + file_name.split('JED_')[1].split('_')[0]
 
+            # Calculate Price, Vat, and Amount
+            df["Unit Price"] = pd.to_numeric(df["Unit Price"], errors='coerce').round(3)
+            df["Quantity"] = pd.to_numeric(df["Quantity"], errors='coerce').fillna(0).astype(int)
+            df["Price"] = (df["Unit Price"] * df["Quantity"]).round(4)
+            df["Vat"] = (df["Price"] * 0.15).round(4)
+            df["Amount"] = (df["Price"] + df["Vat"]).round(4)
+
             # Delete the last row
             if len(df) > 0:
                 df = df[:-1]
 
             # Calculate totals and add a new row
-            total_quantity = int(df["Quantity"].dropna().astype(float).sum())
+            total_quantity = int(df["Quantity"].dropna().astype(int).sum())
             total_price = round(df["Price"].dropna().astype(float).sum(), 4)
             total_vat = round(df["Vat"].dropna().astype(float).sum(), 4)
             total_amount = round(df["Amount"].dropna().astype(float).sum(), 4)
