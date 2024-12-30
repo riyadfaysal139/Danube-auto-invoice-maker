@@ -3,6 +3,7 @@ import pdfplumber
 import pandas as pd
 from datetime import datetime
 import numpy as np
+import df_editor  # Import the new df_editor module
 
 class PDFExtractor:
     def __init__(self, po_date):
@@ -11,6 +12,7 @@ class PDFExtractor:
         self.name_mapping = self.load_mapping('Files/Texts/name_mapping.txt', {"example_key": "example_value"})
         self.dataframes = {}
         self.po_numbers = {}
+        self.edit_all = True  # Add a flag to control editing all DataFrames
 
     def extract_data_from_pdfs(self):
         if not os.path.exists(self.po_date_directory):
@@ -93,7 +95,10 @@ class PDFExtractor:
         # Delete columns 3, 4, 5
         if len(df.columns) > 5:
             df = df.drop(df.columns[[3, 4, 5]], axis=1)
-
+            
+        # Delete the last row
+        if len(df) > 0:
+            df = df[:-1]
         # Rename columns
         df.columns = ["SKU", "Description", "Unit Price", "Quantity", "Price", "Vat", "Amount"]
 
@@ -107,9 +112,7 @@ class PDFExtractor:
         df["Vat"] = (df["Price"] * 0.15).round(4)
         df["Amount"] = (df["Price"] + df["Vat"]).round(4)
 
-        # Delete the last row
-        if len(df) > 0:
-            df = df[:-1]
+
 
         # Calculate totals and add a new row
         total_quantity = int(df["Quantity"].dropna().astype(int).sum())
@@ -131,6 +134,19 @@ class PDFExtractor:
         po_number = file_name.split('337337_')[1].split('_JED')[0]  # Extract PO number from filename
         df = self.extract_text_from_pdf(file_path)
         df = self.clean_dataframe(df)
+        
+        # Ask the user if they want to edit the DataFrame for {file_name} after cleaning
+        if self.edit_all:
+            edit_flag = input(f"Do you want to edit the DataFrame for {file_name}? (yes/no/all): ").strip().lower()
+            if edit_flag == 'all':
+                self.edit_all = False
+                edit_flag = 'yes'
+        else:
+            edit_flag = 'no'
+        
+        # Send DataFrame to df_editor for modifications
+        df = df_editor.modify_dataframe(df, edit_flag)
+        
         df = self.calculate_totals(df)
 
         # Replace name based on mapping

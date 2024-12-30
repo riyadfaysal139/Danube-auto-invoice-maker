@@ -4,19 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Select PO Date</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
       body {
         background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
         background-size: 400% 400%;
         animation: gradientBackground 15s ease infinite;
-        overflow: hidden;
+        margin: 0;
+        height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        margin: 0;
+        overflow: auto; /* Enable scrolling for the entire page */
       }
       @keyframes gradientBackground {
         0% { background-position: 0% 50%; }
@@ -29,45 +29,11 @@
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         animation: fadeIn 1s ease-in-out;
-        position: relative;
-        z-index: 1;
-        text-align: center;
-      }
-      .input-field label {
-        font-weight: bold;
-      }
-      .btn-run {
-        background-color: #4285f4;
-        transition: background-color 0.3s, box-shadow 0.3s;
-        margin-right: 10px;
-      }
-      .btn-run:hover {
-        background-color: #3367d6;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      }
-      .btn-show-all {
-        background-color: #fbbc05;
-        transition: background-color 0.3s, box-shadow 0.3s;
-      }
-      .btn-show-all:hover {
-        background-color: #e6a700;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      }
-      .collection-item {
-        transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
-      }
-      .collection-item:hover {
-        transform: scale(1.05);
-        background-color: #e0f2f1;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
-      .collection-item a {
-        color: #4285f4;
-        transition: color 0.3s;
-      }
-      .collection-item a:hover {
-        color: #3367d6;
-        text-decoration: none;
+        max-height: 90vh;  /* Ensure the container does not exceed the viewport height */
+        overflow: auto;  /* Enable scrolling within the container */
+        max-width: 600px;  /* Center the content and prevent stretching */
+        width: 100%;
+        text-align: center; /* Center text */
       }
       @keyframes fadeIn {
         from {
@@ -77,129 +43,93 @@
           opacity: 1;
         }
       }
-      .button-group {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
+      .btn-primary {
+        background-color: #4285f4;
+        border-color: #4285f4;
+        transition: background-color 0.3s, box-shadow 0.3s;
       }
-      .moving-shapes {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        z-index: 0;
+      .btn-primary:hover {
+        background-color: #3367d6;
+        border-color: #3367d6;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
-      .shape {
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 50%;
-        animation: move 20s linear infinite;
+      .btn-warning {
+        background-color: #fbbc05;
+        border-color: #fbbc05;
+        transition: background-color 0.3s, box-shadow 0.3s;
       }
-      .shape:nth-child(1) {
-        top: 10%;
-        left: 20%;
-        animation-duration: 25s;
-        animation-delay: -2s;
+      .btn-warning:hover {
+        background-color: #e6a700;
+        border-color: #e6a700;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
-      .shape:nth-child(2) {
-        top: 30%;
-        left: 70%;
-        animation-duration: 20s;
-        animation-delay: -4s;
+      .list-group-item {
+        transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
       }
-      .shape:nth-child(3) {
-        top: 50%;
-        left: 40%;
-        animation-duration: 30s;
-        animation-delay: -6s;
+      .list-group-item:hover {
+        transform: scale(1.05);
+        background-color: #e0f2f1;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
-      .shape:nth-child(4) {
-        top: 70%;
-        left: 10%;
-        animation-duration: 35s;
-        animation-delay: -8s;
+      .list-group-item a {
+        color: #4285f4;
+        transition: color 0.3s;
       }
-      .shape:nth-child(5) {
-        top: 90%;
-        left: 80%;
-        animation-duration: 40s;
-        animation-delay: -10s;
-      }
-      @keyframes move {
-        0% {
-          transform: translateY(0) translateX(0);
-        }
-        50% {
-          transform: translateY(-100px) translateX(100px);
-        }
-        100% {
-          transform: translateY(0) translateX(0);
-        }
+      .list-group-item a:hover {
+        color: #3367d6;
+        text-decoration: none;
       }
     </style>
   </head>
   <body>
-    <div class="moving-shapes">
-      <div class="shape"></div>
-      <div class="shape"></div>
-      <div class="shape"></div>
-      <div class="shape"></div>
-      <div class="shape"></div>
-    </div>
     <div class="container">
-      <h1 class="center-align">Select PO Date</h1>
+      <h1 class="text-center">Select PO Date</h1>
       <form method="post">
-        <div class="input-field">
-          <input type="text" id="po_date" name="po_date" class="datepicker" placeholder="Click to select date" required>
-          <label for="po_date">PO Date</label>
+        <div class="mb-3">
+          <label for="po_date" class="form-label">PO Date</label>
+          <input type="text" id="po_date" name="po_date" class="form-control datepicker" placeholder="Click to select date" required>
         </div>
-        <div class="button-group">
-          <button type="submit" class="btn btn-run waves-effect waves-light">Run</button>
-          <button type="submit" name="show_all_po" class="btn btn-show-all waves-effect waves-light">Show all PO</button>
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-primary me-2">Run</button>
+          <button type="submit" name="show_all_po" class="btn btn-warning">Show all PO</button>
         </div>
       </form>
       {% if po_files %}
-      <h2 class="center-align">PO Files for {{ po_date }}</h2>
-      <ul class="collection">
+      <h2 class="text-center mt-4">PO Files for {{ po_date }}</h2>
+      <ul class="list-group">
         {% for file in po_files %}
-        <li class="collection-item">
+        <li class="list-group-item">
           <a href="{{ url_for('download_file', po_date=po_date, filename=file[0]) }}" target="_blank">{{ file[0] }}</a>
         </li>
         {% endfor %}
       </ul>
       {% endif %}
       {% if all_po_files %}
-      <h2 class="center-align">All PO Files</h2>
-      <ul class="collection">
+      <h2 class="text-center mt-4">All PO Files</h2>
+      <ul class="list-group">
         {% for file in all_po_files %}
-        <li class="collection-item">
+        <li class="list-group-item">
           <a href="{{ url_for('download_file', po_date=file.split('/')[0], filename=file.split('/')[1]) }}" target="_blank">{{ file }}</a>
         </li>
         {% endfor %}
       </ul>
       {% endif %}
       {% if invoice_file %}
-      <h2 class="center-align">Created Invoice</h2>
-      <ul class="collection">
-        <li class="collection-item">
+      <h2 class="text-center mt-4">Created Invoice</h2>
+      <ul class="list-group">
+        <li class="list-group-item">
           <a href="{{ url_for('download_invoice', filename=invoice_file.split('/')[-1]) }}" target="_blank">{{ invoice_file.split('/')[-1] }}</a>
         </li>
       </ul>
       {% endif %}
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        var elems = document.querySelectorAll('.datepicker');
-        var instances = M.Datepicker.init(elems, {
-          format: 'yyyy-mm-dd',
-          defaultDate: new Date('{{ default_date }}T00:00:00'),
-          setDefaultDate: true
+        flatpickr('.datepicker', {
+          dateFormat: 'Y-m-d',
+          defaultDate: '{{ default_date }}'
         });
       });
     </script>
