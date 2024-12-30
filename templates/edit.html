@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Edit PO File</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+      body {
+        background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+        background-size: 400% 400%;
+        animation: gradientBackground 15s ease infinite;
+        overflow: auto;  /* Enable scroll wheel */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      @keyframes gradientBackground {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 1s ease-in-out;
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-height: 90vh;  /* Ensure the container does not exceed the viewport height */
+        overflow: auto;  /* Enable scrolling within the container */
+      }
+      .file-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+      }
+      .po-date {
+        font-size: 14px;
+        color: #777;
+        margin-bottom: 20px;
+      }
+      .input-field label {
+        font-weight: bold;
+      }
+      .btn-submit {
+        background-color: #4285f4;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        margin-right: 10px;
+      }
+      .btn-submit:hover {
+        background-color: #3367d6;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .btn-cancel {
+        background-color: #f44336;
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+      .btn-cancel:hover {
+        background-color: #d32f2f;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .button-group {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .dataframe {
+        margin-top: 20px;
+        overflow-x: auto;
+      }
+      .dataframe table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .dataframe th, .dataframe td {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      .dataframe th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #f2f2f2;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="file-name">Edit {{ file_name }}</div>
+      <div class="po-date">PO Date: {{ po_date }}</div>
+      <form method="post" action="{{ url_for('update_file') }}">
+        <input type="hidden" name="file_name" value="{{ file_name }}">
+        <input type="hidden" name="po_date" value="{{ po_date }}">
+        <div class="input-field">
+          <input type="text" id="sku" name="sku" required>
+          <label for="sku">SKU</label>
+        </div>
+        <div class="input-field">
+          <input type="text" id="description" name="description">
+          <label for="description">Description</label>
+        </div>
+        <div class="input-field">
+          <input type="number" step="0.01" id="unit_price" name="unit_price">
+          <label for="unit_price">Unit Price</label>
+        </div>
+        <div class="input-field">
+          <input type="number" id="quantity" name="quantity">
+          <label for="quantity">Quantity</label>
+        </div>
+        <div class="input-field">
+          <select id="action" name="action" required>
+            <option value="" disabled selected>Choose action</option>
+            <option value="add">Add Product</option>
+            <option value="modify">Modify Product</option>
+            <option value="delete">Delete Product</option>
+          </select>
+          <label for="action">Action</label>
+        </div>
+        <div class="button-group">
+          <button type="submit" class="btn btn-submit waves-effect waves-light">Submit</button>
+          <a href="{{ url_for('index') }}" class="btn btn-cancel waves-effect waves-light">Cancel</a>
+        </div>
+      </form>
+      <div class="dataframe">
+        {{ df_html | safe }}
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+      });
+    </script>
+  </body>
+</html>

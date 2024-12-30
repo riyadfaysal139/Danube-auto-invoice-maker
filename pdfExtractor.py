@@ -3,6 +3,7 @@ import pdfplumber
 import pandas as pd
 from datetime import datetime
 import numpy as np
+import df_editor  # Import df_editor to handle DataFrame modifications
 
 class PDFExtractor:
     def __init__(self, po_date):
@@ -94,6 +95,10 @@ class PDFExtractor:
         if len(df.columns) > 5:
             df = df.drop(df.columns[[3, 4, 5]], axis=1)
 
+        # Delete the last row
+        if len(df) > 0:
+            df = df[:-1]
+
         # Rename columns
         df.columns = ["SKU", "Description", "Unit Price", "Quantity", "Price", "Vat", "Amount"]
 
@@ -107,9 +112,6 @@ class PDFExtractor:
         df["Vat"] = (df["Price"] * 0.15).round(4)
         df["Amount"] = (df["Price"] + df["Vat"]).round(4)
 
-        # Delete the last row
-        if len(df) > 0:
-            df = df[:-1]
 
         # Calculate totals and add a new row
         total_quantity = int(df["Quantity"].dropna().astype(int).sum())
@@ -131,6 +133,11 @@ class PDFExtractor:
         po_number = file_name.split('337337_')[1].split('_JED')[0]  # Extract PO number from filename
         df = self.extract_text_from_pdf(file_path)
         df = self.clean_dataframe(df)
+
+        # Pass the cleaned DataFrame to df_editor for editing if required
+        df = df_editor.edit_dataframe(df)
+
+        # Pass the modified DataFrame back to pdfExtractor for total calculation
         df = self.calculate_totals(df)
 
         # Replace name based on mapping
