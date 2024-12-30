@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    default_date = get_date()  # Get the default date from get_date function
+    default_date = get_date()  # Get the current date in the KSA timezone
     po_files = []
     all_po_files = []
     invoice_file = None

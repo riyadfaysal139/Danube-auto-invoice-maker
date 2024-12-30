@@ -198,7 +198,7 @@
         var elems = document.querySelectorAll('.datepicker');
         var instances = M.Datepicker.init(elems, {
           format: 'yyyy-mm-dd',
-          defaultDate: new Date('{{ default_date }}'),
+          defaultDate: new Date('{{ default_date }}T00:00:00'),
           setDefaultDate: true
         });
       });

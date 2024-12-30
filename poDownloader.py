@@ -68,7 +68,7 @@ class PODownloader:
                 ]
 
                 # Download all PDF files and check the date mentioned in the PDF
-                for link in pdf_links:
+                for link in pdf_links[:20]:
                     download_path = os.path.basename(link)
                     if not is_file_downloaded(download_path, cursor):
                         try:
