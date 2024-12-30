@@ -18,7 +18,7 @@ os.makedirs(po_date_directory, exist_ok=True)
 # os.makedirs(invoice_date_directory, exist_ok=True)
 
 # Download all PO
-poDownloader.PODownloader.login()
+#poDownloader.PODownloader.login()
 
 # Create an instance of PDFExtractor
 pdf_extractor = PDFExtractor(str(po_date))

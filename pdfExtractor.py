@@ -137,10 +137,10 @@ class PDFExtractor:
         
         # Ask the user if they want to edit the DataFrame for {file_name} after cleaning
         if self.edit_all:
-            edit_flag = input(f"Do you want to edit the DataFrame for {file_name}? (yes/no/all): ").strip().lower()
-            if edit_flag == 'all':
+            edit_flag = input(f"Do you want to edit the DataFrame for {file_name}? (yes/no/skip_all): ").strip().lower()
+            if edit_flag == 'skip_all':
                 self.edit_all = False
-                edit_flag = 'yes'
+                edit_flag = 'no'
         else:
             edit_flag = 'no'
         
