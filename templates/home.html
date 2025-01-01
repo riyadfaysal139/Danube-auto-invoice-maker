@@ -89,6 +89,14 @@
           <label for="po_date" class="form-label">PO Date</label>
           <input type="text" id="po_date" name="po_date" class="form-control datepicker" placeholder="Click to select date" required>
         </div>
+        <div class="mb-3">
+          <label for="flag-select" class="form-label">Choose a flag:</label>
+          <select id="flag-select" name="flag" class="form-control">
+            <option value="yes" {% if selected_flag == 'yes' %}selected{% endif %}>Yes</option>
+            <option value="no" {% if selected_flag == 'no' %}selected{% endif %}>No</option>
+            <option value="skip all" {% if selected_flag == 'skip all' %}selected{% endif %}>Skip All</option>
+          </select>
+        </div>
         <div class="d-flex justify-content-center">
           <button type="submit" class="btn btn-primary me-2">Run</button>
           <button type="submit" name="show_all_po" class="btn btn-warning">Show all PO</button>

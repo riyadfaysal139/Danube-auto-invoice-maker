@@ -9,11 +9,14 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def index():
     default_date = get_date()  # Get the current date in the KSA timezone
+    default_date = '2024-12-25'
     po_files = []
     all_po_files = []
     invoice_file = None
     po_date = None
+    selected_flag = "skip all"  # Default flag value
     if request.method == 'POST':
+        selected_flag = request.form.get('flag', "skip all")
         if 'show_all_po' in request.form:
             # Show all PO files
             for root, dirs, files in os.walk('Files/PO'):
@@ -24,7 +27,7 @@ def index():
         else:
             po_date = request.form['po_date']
             # Run the main.py script with the selected po_date and capture the output
-            result = subprocess.run(['python', 'main.py', po_date], capture_output=True, text=True)
+            result = subprocess.run(['python', 'main.py', po_date, selected_flag], capture_output=True, text=True)
             invoice_file = result.stdout.strip()
             
             # Fetch the list of POs for the selected date
@@ -35,7 +38,7 @@ def index():
             po_files = cursor.fetchall()
             conn.close()
         
-    return render_template('index.html', default_date=default_date, po_files=po_files, all_po_files=all_po_files, po_date=po_date, invoice_file=invoice_file)
+    return render_template('home.html', default_date=default_date, po_files=po_files, all_po_files=all_po_files, po_date=po_date, invoice_file=invoice_file, selected_flag=selected_flag)
 
 @app.route('/Files/PO/<po_date>/<filename>')
 def download_file(po_date, filename):

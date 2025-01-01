@@ -7,7 +7,7 @@ from invoiceprinter import print_invoice  # Import the print function
 
 # Get po_date from command-line argument or use default
 po_date = sys.argv[1] if len(sys.argv) > 1 else get_date()
-#po_date='2024-12-25'
+po_date='2024-12-25'
 invoicedate = get_date(days=1, specific_date=str(po_date))
 
 # Create directories for po_date and invoicedate
