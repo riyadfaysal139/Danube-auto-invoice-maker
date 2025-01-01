@@ -1,0 +1,7 @@
+pip install pdfplumber
+pip install qrcode
+pip install fpdf
+pip install pywin32
+pip install pyPDF2
+pip install b64
+pip install playwright
