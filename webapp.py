@@ -26,7 +26,7 @@ def index():
                     print(relative_path)
         else:
             po_date = request.form['po_date']
-            # Run the main.py script with the selected po_date and capture the output
+            # Run the main.py script with the selected po_date and selected_flag
             result = subprocess.run(['python', 'main.py', po_date, selected_flag], capture_output=True, text=True)
             invoice_file = result.stdout.strip()
             

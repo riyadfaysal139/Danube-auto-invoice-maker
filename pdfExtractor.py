@@ -6,8 +6,9 @@ import numpy as np
 import df_editor  # Import the new df_editor module
 
 class PDFExtractor:
-    def __init__(self, po_date):
+    def __init__(self, po_date, selected_flag):
         self.po_date = po_date
+        self.selected_flag = selected_flag
         self.po_date_directory = os.path.join('Files', 'PO', po_date)
         self.name_mapping = self.load_mapping('Files/Texts/name_mapping.txt', {"example_key": "example_value"})
         self.dataframes = {}
@@ -135,17 +136,8 @@ class PDFExtractor:
         df = self.extract_text_from_pdf(file_path)
         df = self.clean_dataframe(df)
         
-        # Ask the user if they want to edit the DataFrame for {file_name} after cleaning
-        if self.edit_all:
-            edit_flag = input(f"Do you want to edit the DataFrame for {file_name}? (yes/no/skip_all): ").strip().lower()
-            if edit_flag == 'skip_all':
-                self.edit_all = False
-                edit_flag = 'no'
-        else:
-            edit_flag = 'no'
-        
         # Send DataFrame to df_editor for modifications
-        df = df_editor.modify_dataframe(df, edit_flag)
+        df = df_editor.modify_dataframe(df, self.selected_flag)
         
         df = self.calculate_totals(df)
 
