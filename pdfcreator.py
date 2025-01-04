@@ -28,10 +28,13 @@ class PDFCreator:
             pdf.set_font("Amiri", '', 14)
 
             # Add dataframe data
-            self.add_dataframe_data(pdf, dataframe, description_mapping, arabic_description_mapping)
+            total_quantity, total_price, total_vat, total_amount = self.add_dataframe_data(pdf, dataframe, description_mapping, arabic_description_mapping)
 
             # Print the dataframe in table format
             print(dataframe.to_string(index=False))
+
+            # Add summary lines before QR code
+            self.add_summary_lines(pdf, total_quantity, total_price, total_vat, total_amount)
 
             # Generate and add QR code
             self.add_qr_code(pdf, title, invoicedate, dataframe)
@@ -82,6 +85,7 @@ class PDFCreator:
         return base_invoice_number + increment
 
     def add_dataframe_data(self, pdf, dataframe, description_mapping, arabic_description_mapping):
+        print(f"\n*******\n*************Creating PDF...{dataframe}\n*******\n*************")
         num_columns = len(dataframe.columns) + 1  # Adding one for the new column
         col_widths = [30 if i == 1 else (280 - 30) / (num_columns - 1) for i in range(num_columns)]
 
@@ -116,8 +120,36 @@ class PDFCreator:
             last_row_index = dataframe.index[-1]
             dataframe.at[last_row_index, 'Description'] = None
             dataframe.at[last_row_index, 'Unit Price'] = None
-            dataframe.at[last_row_index, 'Quantity'] = None
-            dataframe.at[last_row_index, 'Amount'] = None
+
+
+        # Extract totals from the last row of the dataframe
+        total_quantity = dataframe.iloc[-1]["Quantity"]
+        total_price = dataframe.iloc[-1]["Price"]
+        total_vat = dataframe.iloc[-1]["Vat"]
+        total_amount = dataframe.iloc[-1]["Amount"]
+
+        # Debugging: Print the extracted totals
+        print(f"Total quantity: {total_quantity}, Total price: {total_price}, Total vat: {total_vat}, Total amount: {total_amount}")
+
+        return total_quantity, total_price, total_vat, total_amount
+
+    def add_summary_lines(self, pdf, total_quantity, total_price, total_vat, total_amount):
+        pdf.set_font("Amiri", 'B', 16)
+        pdf.set_fill_color(230, 230, 230)  # Set grey background color
+
+        # Line 1
+        pdf.cell(0, 10, f"Total quantity: {total_quantity}", 0, 0, 'C', fill=True)
+        pdf.cell(0, 10, f"Total (ex. vat): {total_price} SAR", 0, 1, 'R', fill=True)
+
+        # Line 2
+        pdf.cell(0, 10, "", 0, 0, 'C', fill=True)  # Empty cell for alignment
+        pdf.cell(0, 10, f"Total vat (15%): {total_vat} SAR", 0, 1, 'R', fill=True)
+
+        # Line 3
+        pdf.cell(0, 10, "", 0, 0, 'C', fill=True)  # Empty cell for alignment
+        pdf.cell(0, 10, f"Total (inc. vat): {total_amount} SAR", 0, 1, 'R', fill=True)
+
+        pdf.ln(10)  # Add some space after the summary lines
 
     def add_qr_code(self, pdf, title, invoicedate, dataframe):
         seller_name = "337337 FAKHR ALTASHYEED EST."
