@@ -7,8 +7,11 @@ from openpyxl.styles import Alignment, Font
 from openpyxl.cell.cell import MergedCell  # Import MergedCell
 
 def generate_monthly_statement(month, year):
+    # Define the base project directory
+    project_dir = os.path.dirname(os.path.abspath(__file__))
+    
     # Define the file path based on the month and year
-    file_path = f'/Volumes/Mac SD/Study/My codes/Danube-auto-invoice-maker-1/Files/Texts/statement-{month}-{year}.txt'
+    file_path = os.path.join(project_dir, f'Files/Texts/statement-{month}-{year}.txt')
     
     # Check if the file exists
     if not os.path.exists(file_path):
@@ -60,7 +63,7 @@ def generate_monthly_statement(month, year):
     df["Balance"] = df["Debit"] + df["Vat(15%)"] - df["Credit"]
     
     # Define the output Excel file path
-    output_file_path = f'/Volumes/Mac SD/Study/My codes/Danube-auto-invoice-maker-1/Files/Statements/statement-{month}-{year}.xlsx'
+    output_file_path = os.path.join(project_dir, f'Files/Statements/statement-{month}-{year}.xlsx')
     
     # Ensure the directory for the output file exists
     os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
