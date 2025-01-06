@@ -58,6 +58,8 @@ def add_row(df):
 
 def delete_row(df):
     sku_number = input("Enter the SKU number of the row to delete: ").strip()
+    # Convert the input SKU number to the same type as the SKU column
+    sku_number = convert_sku_type(sku_number, df['SKU'].dtype)
     row_index = df[df['SKU'] == sku_number].index
     if not row_index.empty:
         df = df.drop(row_index).reset_index(drop=True)
@@ -70,6 +72,8 @@ def delete_row(df):
 
 def modify_row(df):
     sku_number = input("Enter the SKU number of the row to modify: ").strip()
+    # Convert the input SKU number to the same type as the SKU column
+    sku_number = convert_sku_type(sku_number, df['SKU'].dtype)
     row_index = df[df['SKU'] == sku_number].index
     if not row_index.empty:
         row_index = row_index[0]
@@ -92,6 +96,14 @@ def modify_row(df):
     else:
         print("Invalid SKU number.")
     return df
+
+def convert_sku_type(sku_number, dtype):
+    if dtype == 'int64':
+        return int(sku_number)
+    elif dtype == 'float64':
+        return float(sku_number)
+    else:
+        return sku_number
 
 def recalculate_totals(df):
     df["Unit Price"] = pd.to_numeric(df["Unit Price"], errors='coerce').round(3)
